@@ -69,46 +69,32 @@ public class RuntimeProxyBeanDefinitionWriter extends ProxyingBeanDefinitionWrit
         BeanResolutionContext.class, BeanDefinition.class);
 
     public RuntimeProxyBeanDefinitionWriter(ClassElement targetType, BeanDefinitionWriter parent, OptionalValues<Boolean> settings, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
-        super(RUNTIME_PROXY_SUFFIX, targetType, targetType, parent, settings, visitorContext, interceptorBinding);
+        super(getConstructor(targetType), RUNTIME_PROXY_SUFFIX, targetType, targetType, parent, settings, visitorContext, interceptorBinding);
     }
 
-    public RuntimeProxyBeanDefinitionWriter(ClassElement targetType, ClassElement[] interfaceTypes, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
-        super(RUNTIME_PROXY_SUFFIX, targetType, targetType, interfaceTypes, visitorContext, interceptorBinding);
+    public RuntimeProxyBeanDefinitionWriter(ClassElement targetType, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
+        super(getConstructor(targetType), RUNTIME_PROXY_SUFFIX, targetType, targetType, visitorContext, interceptorBinding);
     }
 
-    public RuntimeProxyBeanDefinitionWriter(String suffix, ClassElement targetType, boolean implementInterface, ClassElement[] interfaceTypes, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
-        super(suffix + RUNTIME_PROXY_SUFFIX, targetType, targetType, implementInterface, interfaceTypes, visitorContext, interceptorBinding);
+    public RuntimeProxyBeanDefinitionWriter(String suffix, ClassElement targetType, boolean implementInterface, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
+        super(getConstructor(targetType), suffix + RUNTIME_PROXY_SUFFIX, targetType, targetType, implementInterface, visitorContext, interceptorBinding);
+    }
+
+    @Override
+    public String getCustomBeanDefinitionName() {
+        return proxyType.getPackageName() + prefixClassName(proxyType.getSimpleName()) + RUNTIME_PROXY_SUFFIX;
+    }
+
+    private static String prefixClassName(String className) {
+        if (className.startsWith("$")) {
+            return className;
+        }
+        return "$" + className;
     }
 
     @Override
     protected boolean getProxyTarget(ClassElement targetType, BeanDefinitionWriter parent, OptionalValues<Boolean> settings) {
         return super.getProxyTarget(targetType, parent, settings) || targetType.isTrue(RuntimeProxy.class, "proxyTarget");
-    }
-
-    @Override
-    protected BeanDefinitionWriter createAdviceProxyBeanDefinitionWriter(String suffix) {
-        return new BeanDefinitionWriter(
-            ClassElement.of(parentWriter.getPackageName() + '.' + parentWriter.getBeanSimpleName(), parentWriter.isInterface(), parentWriter.getAnnotationMetadata()),
-            targetType.getName() + suffix,
-            parentWriter,
-            visitorContext,
-            null
-        );
-    }
-
-    @Override
-    protected BeanDefinitionWriter createIntroductionProxyBeanDefinitionWriter(String suffix) {
-        return new BeanDefinitionWriter(
-            ClassElement.of(
-                targetType.getName(),
-                targetType.isInterface(),
-                targetType.getAnnotationMetadata()
-            ),
-            targetType.getName() + suffix,
-            this,
-            visitorContext,
-            null
-        );
     }
 
     @Override
@@ -131,4 +117,5 @@ public class RuntimeProxyBeanDefinitionWriter extends ProxyingBeanDefinitionWrit
                 .invoke(CREATE_PROXY, runtimeProxyDefinition);
         });
     }
+
 }

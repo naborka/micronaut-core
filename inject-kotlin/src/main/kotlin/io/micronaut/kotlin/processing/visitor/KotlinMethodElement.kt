@@ -15,13 +15,21 @@
  */
 package io.micronaut.kotlin.processing.visitor
 
-import com.google.devtools.ksp.*
-import com.google.devtools.ksp.symbol.*
-import io.micronaut.inject.ast.*
+import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.isPrivate
+import com.google.devtools.ksp.isProtected
+import com.google.devtools.ksp.isPublic
+import com.google.devtools.ksp.symbol.FunctionKind
+import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.Modifier
+import io.micronaut.inject.ast.ClassElement
+import io.micronaut.inject.ast.MethodElement
+import io.micronaut.inject.ast.ParameterElement
 import io.micronaut.inject.ast.annotation.ElementAnnotationMetadataFactory
 import io.micronaut.kotlin.processing.getBinaryName
-import java.util.function.Function
+import java.util.*
 import java.util.stream.Collectors
+import kotlin.math.ceil
 
 @OptIn(KspExperimental::class)
 internal open class KotlinMethodElement(
@@ -36,7 +44,7 @@ internal open class KotlinMethodElement(
     owningType,
     elementAnnotationMetadataFactory,
     visitorContext
-), MethodElement {
+), MethodElement, io.micronaut.inject.ast.KotlinMethodElement {
 
     constructor(
         owningType: KotlinClassElement,
@@ -137,4 +145,28 @@ internal open class KotlinMethodElement(
             elementAnnotationMetadataFactory,
             visitorContext,
         )
+
+    override fun getDefaultValuesMethod(): Optional<MethodElement> {
+        if (parameters.any { parameterElement -> parameterElement is io.micronaut.inject.ast.KotlinParameterElement && parameterElement.hasDefault() }) {
+            val parameterElements: MutableList<ParameterElement> = mutableListOf()
+            parameterElements.addAll(parameters)
+            val numberOfMasks = ceil(parameters.size / 32.0).toInt()
+            (0..numberOfMasks).forEach { i ->
+                parameterElements.add(ParameterElement.of(Int::class.java, io.micronaut.inject.ast.KotlinMethodElement.MARKER_PARAMETER_NAME + i))
+            }
+            parameterElements.add(ParameterElement.of(kotlin.jvm.internal.DefaultConstructorMarker::class.java, io.micronaut.inject.ast.KotlinMethodElement.MARKER_PARAMETER_NAME))
+            return Optional.of(
+                MethodElement.of(
+                    owningType,
+                    this,
+                    returnType,
+                    genericReturnType,
+                    name,
+                    *parameterElements.toTypedArray<ParameterElement>()
+                )
+            )
+        } else {
+            return Optional.empty()
+        }
+    }
 }

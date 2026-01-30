@@ -15,6 +15,7 @@ import io.micronaut.inject.ast.EnumElement
 import io.micronaut.inject.ast.FieldElement
 import io.micronaut.inject.ast.GenericElement
 import io.micronaut.inject.ast.GenericPlaceholderElement
+import io.micronaut.inject.ast.KotlinMethodElement
 import io.micronaut.inject.ast.MemberElement
 import io.micronaut.inject.ast.MethodElement
 import io.micronaut.inject.ast.PropertyElement
@@ -27,6 +28,24 @@ import jakarta.validation.Valid
 import spock.lang.PendingFeature
 
 class ClassElementSpec extends AbstractKotlinCompilerSpec {
+
+    void "test default values constructor"() {
+        when:
+            def result = buildClassElementMapped('test.DefaultsClass', '''
+package test
+
+open class DefaultsClass(private val name: String = "String", private val age: Int = 22)
+
+''', cl -> {
+
+                KotlinMethodElement constructor = cl.getPrimaryConstructor().get() as KotlinMethodElement
+
+                MethodElement defaultValuesMethod = constructor.defaultValuesMethod.get()
+                return true
+            })
+        then:
+            result
+    }
 
     void "test Java Record compile"() {
         def ce = buildClassElementJava('test.Product2', '''
