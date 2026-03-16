@@ -26,6 +26,7 @@ import io.micronaut.inject.ElementBeanDefinitionBuilder;
 import io.micronaut.inject.ElementProxyBuilder;
 import io.micronaut.inject.OutputObjectDef;
 import io.micronaut.inject.ProxyBeanDefinition;
+import io.micronaut.inject.annotation.MutableAnnotationMetadata;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.Element;
 import io.micronaut.inject.ast.ElementQuery;
@@ -45,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -193,7 +193,7 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
     }
 
     @Override
-    public void implementInterface(ClassElement interfaceElement, Function<MethodElement, AnnotationMetadata> annotationMetadataProvider) {
+    public void implementInterface(ClassElement interfaceElement) {
         interfaceTypes.add(interfaceElement);
         proxyBeanDefinitionWriter.setExposes(interfaceTypes);
         proxyBeanDefinitionWriter.addOriginatingElement(interfaceElement);
@@ -206,10 +206,9 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
         interfaceElement.getEnclosedElements(ElementQuery.ALL_METHODS)
             .forEach(methodElement -> {
 
-                AnnotationMetadata annotationMetadata = annotationMetadataProvider.apply(methodElement);
-                if (annotationMetadata != methodElement) {
-                    methodElement = methodElement.withAnnotationMetadata(annotationMetadata);
-                }
+                MutableAnnotationMetadata mutableAnnotationMetadata = MutableAnnotationMetadata.of(targetType.getAnnotationMetadata());
+                mutableAnnotationMetadata.addAnnotationMetadata(MutableAnnotationMetadata.of(methodElement.getMethodAnnotationMetadata()));
+                methodElement = methodElement.withAnnotationMetadata(mutableAnnotationMetadata);
 
                 addProxyMethodInternal(methodElement, true);
             });

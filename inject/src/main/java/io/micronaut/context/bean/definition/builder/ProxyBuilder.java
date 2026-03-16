@@ -1,9 +1,5 @@
 package io.micronaut.context.bean.definition.builder;
 
-import io.micronaut.core.annotation.AnnotationMetadata;
-
-import java.util.function.Function;
-
 /**
  * Builder abstraction for proxy-oriented bean definitions.
  *
@@ -18,9 +14,8 @@ public interface ProxyBuilder<C, M, R> extends Builder<R> {
      * Adds an interface to be implemented by the proxy.
      *
      * @param interfaceElement          The interface element
-     * @param annotationMetadataProvider Metadata provider for proxy methods
      */
-    void implementInterface(C interfaceElement, Function<M, AnnotationMetadata> annotationMetadataProvider);
+    void implementInterface(C interfaceElement);
 
     /**
      * Adds a proxied method that delegates to the target.

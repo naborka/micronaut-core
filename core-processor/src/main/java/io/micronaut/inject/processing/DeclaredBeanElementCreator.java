@@ -26,6 +26,7 @@ import io.micronaut.core.annotation.AnnotationClassValue;
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.AnnotationUtil;
 import io.micronaut.core.annotation.AnnotationValue;
+import io.micronaut.core.annotation.Indexed;
 import io.micronaut.core.annotation.Internal;
 import io.micronaut.core.annotation.NextMajorVersion;
 import io.micronaut.core.util.CollectionUtils;
@@ -33,6 +34,8 @@ import io.micronaut.core.util.StringUtils;
 import io.micronaut.inject.ElementBeanDefinitionBuilder;
 import io.micronaut.inject.ElementBeanDefinitionBuilderFactory;
 import io.micronaut.inject.ElementProxyBuilder;
+import io.micronaut.inject.annotation.AnnotationMetadataHierarchy;
+import io.micronaut.inject.annotation.MutableAnnotationMetadata;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.FieldElement;
@@ -598,32 +601,35 @@ sealed class DeclaredBeanElementCreator<R> extends AbstractBeanElementCreator<R>
 
         interfaceToAdapt = interfaceToAdapt.withTypeArguments(genericTypes);
 
+        AnnotationClassValue<?>[] adaptedArgumentTypes = Arrays.stream(sourceParams)
+            .map(p -> new AnnotationClassValue<>(getClassName(p.getGenericType())))
+            .toArray(AnnotationClassValue[]::new);
+
+        interfaceToAdapt.annotate(Adapter.class, builder -> {
+            builder.member(Adapter.InternalAttributes.ADAPTED_BEAN, new AnnotationClassValue<>(getClassName(classElement)));
+            builder.member(Adapter.InternalAttributes.ADAPTED_METHOD, sourceMethod.getName());
+            builder.member(Adapter.InternalAttributes.ADAPTED_ARGUMENT_TYPES, adaptedArgumentTypes);
+            String qualifier = classElement.stringValue(AnnotationUtil.NAMED).orElse(null);
+            if (StringUtils.isNotEmpty(qualifier)) {
+                builder.member(Adapter.InternalAttributes.ADAPTED_QUALIFIER, qualifier);
+            }
+        });
+
+        ClassElement finalInterfaceToAdapt1 = interfaceToAdapt;
+        interfaceToAdapt.annotate(Indexed.class, builder -> builder.member(AnnotationMetadata.VALUE_MEMBER, new AnnotationClassValue<>(finalInterfaceToAdapt1.getName())));
+
+        MutableAnnotationMetadata proxyAnnotationMetadata = MutableAnnotationMetadata.of(
+            new AnnotationMetadataHierarchy(classElement, interfaceToAdapt)
+        );
+
         ElementProxyBuilder<R> aopProxyWriter = beanDefinitionBuilderFactory.introductionProxy(
             adapterProxyClassName,
-            classElement // TODO: The best would be to add a requires for the adapted bean instead of coping all the annotations
+            proxyAnnotationMetadata
+             // TODO: The best would be to add a requires for the adapted bean instead of coping all the annotations
         );
         additionalBuilders.add(aopProxyWriter);
 
-        aopProxyWriter.implementInterface(interfaceToAdapt, methodElement -> {
-            if (methodElement.equals(targetMethod)) {
-                AnnotationClassValue<?>[] adaptedArgumentTypes = Arrays.stream(sourceParams)
-                    .map(p -> new AnnotationClassValue<>(getClassName(p.getGenericType())))
-                    .toArray(AnnotationClassValue[]::new);
-
-                targetMethod.annotate(Adapter.class, builder -> {
-                    builder.member(Adapter.InternalAttributes.ADAPTED_BEAN, new AnnotationClassValue<>(getClassName(classElement)));
-                    builder.member(Adapter.InternalAttributes.ADAPTED_METHOD, sourceMethod.getName());
-                    builder.member(Adapter.InternalAttributes.ADAPTED_ARGUMENT_TYPES, adaptedArgumentTypes);
-                    String qualifier = classElement.stringValue(AnnotationUtil.NAMED).orElse(null);
-                    if (StringUtils.isNotEmpty(qualifier)) {
-                        builder.member(Adapter.InternalAttributes.ADAPTED_QUALIFIER, qualifier);
-                    }
-                });
-
-                return targetMethod;
-            }
-            return targetMethod;
-        });
+        aopProxyWriter.implementInterface(interfaceToAdapt);
     }
 
     private static String getClassName(ClassElement element) {

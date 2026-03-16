@@ -18,7 +18,6 @@ import io.micronaut.core.annotation.AnnotationUtil;
 import io.micronaut.core.annotation.AnnotationValue;
 import io.micronaut.core.util.ArrayUtils;
 import io.micronaut.core.value.OptionalValues;
-import io.micronaut.inject.annotation.MutableAnnotationMetadata;
 import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.ElementQuery;
 import io.micronaut.inject.ast.FieldElement;
@@ -190,11 +189,7 @@ public class DefaultElementBeanDefinitionBuilderFactory implements ElementBeanDe
 
         ProxyingBeanDefinitionWriter proxyBuilder = introductionProxy(target, true);
 
-        interfaceTypes.forEach(interfaceType -> proxyBuilder.implementInterface(interfaceType, methodElement -> {
-            MutableAnnotationMetadata mutableAnnotationMetadata = MutableAnnotationMetadata.of(target.getAnnotationMetadata());
-            mutableAnnotationMetadata.addAnnotationMetadata(MutableAnnotationMetadata.of(methodElement.getMethodAnnotationMetadata()));
-            return methodElement.withAnnotationMetadata(mutableAnnotationMetadata);
-        }));
+        interfaceTypes.forEach(proxyBuilder::implementInterface);
 
         return proxyBuilder;
     }
