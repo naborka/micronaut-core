@@ -353,7 +353,7 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
         String methodName = methodElement.getName();
         List<ParameterElement> argumentTypeList = Arrays.asList(methodElement.getSuspendParameters());
         ClassElement returnType = methodElement.isSuspend() ? ClassElement.of(Object.class) : methodElement.getReturnType();
-        MethodRef methodKey = new MethodRef(methodElement, methodName, argumentTypeList, returnType);
+        MethodRef methodKey = new MethodRef(methodName, argumentTypeList, returnType);
 
         if (!uniqueInterceptedMethodsRefs.contains(methodKey)) {
             if (!isProxyTarget) {
@@ -778,7 +778,7 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
 
                             ExpressionDef.constant(methodElement.getName()),
                             TypeDef.CLASS.array().instantiate(
-                                Arrays.stream(methodElement.getSuspendParameters()).map(p -> ExpressionDef.constant(TypeDef.erasure(p.getType()))).toList()
+                                Arrays.stream(methodElement.getSuspendParameters()).map(p -> ExpressionDef.constant(TypeDef.erasure(p.getGenericType()))).toList()
                             )
                         )
                     ).toList()
@@ -978,19 +978,14 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
      * Method Reference class with names and a list of argument types. Used as the targets.
      */
     private static final class MethodRef {
-        private final MethodElement methodElement;
         private final String name;
-        private final List<ClassElement> argumentTypes;
-        private final List<ClassElement> genericArgumentTypes;
         private final String returnType;
         private final List<String> rawTypes;
 
-        public MethodRef(MethodElement methodElement, String name, List<ParameterElement> parameterElements, ClassElement returnType) {
-            this.methodElement = methodElement;
+        public MethodRef(String name, List<ParameterElement> parameterElements, ClassElement returnType) {
             this.name = name;
-            this.argumentTypes = parameterElements.stream().map(ParameterElement::getType).toList();
-            this.genericArgumentTypes = parameterElements.stream().map(ParameterElement::getGenericType).toList();
-            this.rawTypes = this.argumentTypes.stream().map(AopProxyWriter::toTypeString).toList();
+            List<ClassElement> argumentTypes = parameterElements.stream().map(ParameterElement::getType).toList();
+            this.rawTypes = argumentTypes.stream().map(AopProxyWriter::toTypeString).toList();
             this.returnType = toTypeString(returnType);
         }
 

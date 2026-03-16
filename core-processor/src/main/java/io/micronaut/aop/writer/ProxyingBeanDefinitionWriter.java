@@ -224,7 +224,6 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
             addOriginatingElement(methodElement.getDeclaringType());
         }
 
-        ClassElement declaringType = methodElement.getDeclaringType();
         if (methodElement.isAbstract()) {
             addIntroductionMethod(methodElement);
         } else if (!ignoreNotAbstract) {
