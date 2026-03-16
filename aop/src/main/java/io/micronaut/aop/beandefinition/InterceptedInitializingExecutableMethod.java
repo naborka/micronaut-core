@@ -4,6 +4,7 @@ import io.micronaut.context.BeanContext;
 import io.micronaut.context.BeanResolutionContext;
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.annotation.Internal;
+import io.micronaut.core.type.Argument;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -31,7 +32,7 @@ public final class InterceptedInitializingExecutableMethod<T> extends AbstractEx
                                             BeanResolutionContext beanResolutionContext,
                                             BeanContext beanContext,
                                             T bean) {
-        super(interceptedInitializingBeanDefinition.getBeanType(), "initialize");
+        super(interceptedInitializingBeanDefinition.getBeanType(), "initialize", Argument.of(interceptedInitializingBeanDefinition.getBeanType()));
         this.interceptedInitializingBeanDefinition = interceptedInitializingBeanDefinition;
         this.beanResolutionContext = beanResolutionContext;
         this.beanContext = beanContext;
