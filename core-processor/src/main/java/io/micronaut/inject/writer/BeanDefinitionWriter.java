@@ -909,9 +909,9 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
 
     @Override
     public void addFieldInjection(FieldDefinition<ClassElement, FieldElement> fieldDefinition) {
-        allFields.add(fieldDefinition);
+        injectCommands.add(new InjectField(fieldDefinition));
         if (shouldKeepInjectionPoint(fieldDefinition.annotationMetadata())) {
-            injectCommands.add(new InjectField(fieldDefinition));
+            allFields.add(fieldDefinition);
         }
         FieldElement fieldElement = fieldDefinition.fieldElement();
         autoApplyNamedIfPresent(fieldElement, fieldElement.getAnnotationMetadata());
