@@ -152,7 +152,7 @@ public interface MethodElement extends MemberElement {
     }
 
     /**
-     * Return the index of the parameter with the name;
+     * Returns the index of the parameter with the supplied name.
      *
      * @param name The name of the parameter
      * @return The parameter index or -1

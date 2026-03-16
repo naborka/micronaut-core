@@ -241,23 +241,6 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
         this.cacheLazyTarget = lazy && settings.get(Interceptor.CACHEABLE_LAZY_TARGET).orElse(false);
     }
 
-    private static ClassElement createProxyType(BeanDefinitionWriter parent) {
-        ClassElement target = parent.getBeanTypeElement();
-        return createProxyType(target, parent.getBeanDefinitionName() + PROXY_SUFFIX, parent.getAnnotationMetadata());
-    }
-
-    private static ClassElement createProxyType(ClassElement target) {
-        String proxyName = target.getName() + PROXY_SUFFIX;
-        return createProxyType(target, proxyName, target.getAnnotationMetadata());
-    }
-
-    private static ClassElement createProxyType(ClassElement target, String proxyName, AnnotationMetadata annotationMetadata) {
-        if (target.isInterface()) {
-            return ClassElement.of(proxyName, false, annotationMetadata, Map.of(), null, List.of(target));
-        }
-        return ClassElement.of(proxyName, false, annotationMetadata, Map.of(), target, List.of());
-    }
-
     /**
      * Constructs a new {@link AopProxyWriter} for the purposes of writing {@link io.micronaut.aop.Introduction} advise.
      *
@@ -282,6 +265,23 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
         this.hotswap = false;
         this.lazy = false;
         this.cacheLazyTarget = false;
+    }
+
+    private static ClassElement createProxyType(BeanDefinitionWriter parent) {
+        ClassElement target = parent.getBeanTypeElement();
+        return createProxyType(target, parent.getBeanDefinitionName() + PROXY_SUFFIX, parent.getAnnotationMetadata());
+    }
+
+    private static ClassElement createProxyType(ClassElement target) {
+        String proxyName = target.getName() + PROXY_SUFFIX;
+        return createProxyType(target, proxyName, target.getAnnotationMetadata());
+    }
+
+    private static ClassElement createProxyType(ClassElement target, String proxyName, AnnotationMetadata annotationMetadata) {
+        if (target.isInterface()) {
+            return ClassElement.of(proxyName, false, annotationMetadata, Map.of(), null, List.of(target));
+        }
+        return ClassElement.of(proxyName, false, annotationMetadata, Map.of(), target, List.of());
     }
 
     private static MethodElement createProxyConstructor(ClassElement target, ClassElement proxyClass, VisitorContext visitorContext) {

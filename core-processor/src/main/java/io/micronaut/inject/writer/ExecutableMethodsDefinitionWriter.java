@@ -182,11 +182,11 @@ public class ExecutableMethodsDefinitionWriter implements Builder<OutputObjectDe
         methodDispatchWriter.addOrGetMethod(declaringType, methodElement);
     }
 
-    public void addBridgeMethod(MethodElement methodElement, MethodElement proxyMethod) {
+    public final void addBridgeMethod(MethodElement methodElement, MethodElement proxyMethod) {
         methodDispatchWriter.addOrGetInterceptedMethod(methodElement.getDeclaringType(), methodElement, proxyMethod);
     }
 
-    public int findIndexOfExecutableMethod(MethodElement methodElement) {
+    public final int findIndexOfExecutableMethod(MethodElement methodElement) {
         int index = methodDispatchWriter.findMethodIndex(methodElement);
         if (index == -1) {
             throw new IllegalStateException("Cannot find the method: " + methodElement);

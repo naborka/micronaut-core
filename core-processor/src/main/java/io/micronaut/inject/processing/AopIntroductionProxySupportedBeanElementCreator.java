@@ -31,6 +31,7 @@ import java.util.List;
 /**
  * Ordinary bean with AOP introduction.
  *
+ * @param <R> The builder result type
  * @author Denis Stepanov
  * @since 4.0.0
  */
@@ -42,7 +43,7 @@ final class AopIntroductionProxySupportedBeanElementCreator<R> extends DeclaredB
     AopIntroductionProxySupportedBeanElementCreator(ClassElement classElement,
                                                     VisitorContext visitorContext,
                                                     boolean isAopProxy,
-                                                    ElementBeanDefinitionBuilderFactory<R> beanDefinitionBuilder ) {
+                                                    ElementBeanDefinitionBuilderFactory<R> beanDefinitionBuilder) {
         super(classElement, visitorContext, isAopProxy, beanDefinitionBuilder);
         if (classElement.isFinal()) {
             throw new ProcessingException(classElement, "Cannot apply AOP advice to final class. Class must be made non-final to support proxying: " + classElement.getName());

@@ -62,6 +62,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Ordinary declared bean.
  *
+ * @param <R> The builder result type
  * @author Denis Stepanov
  * @since 4.0.0
  */
@@ -75,11 +76,11 @@ sealed class DeclaredBeanElementCreator<R> extends AbstractBeanElementCreator<R>
     private static final String MSG_ADAPTER_METHOD_PREFIX = "Cannot adapt method [";
     private static final String MSG_TARGET_METHOD_PREFIX = "] to target method [";
 
-    private ElementProxyBuilder<R> aopProxyBuilder;
     protected final boolean isAopProxy;
-    private final AtomicInteger adaptedMethodIndex = new AtomicInteger(0);
     protected final ElementBeanDefinitionBuilderFactory<R> beanDefinitionBuilderFactory;
     protected final List<Builder<List<R>>> additionalBuilders = new ArrayList<>();
+    private final AtomicInteger adaptedMethodIndex = new AtomicInteger(0);
+    private ElementProxyBuilder<R> aopProxyBuilder;
 
     protected DeclaredBeanElementCreator(ClassElement classElement, VisitorContext visitorContext, boolean isAopProxy, ElementBeanDefinitionBuilderFactory<R> beanDefinitionBuilderFactory) {
         super(classElement, visitorContext, beanDefinitionBuilderFactory);

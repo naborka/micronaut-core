@@ -678,7 +678,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     private final Function<String, ExpressionDef> loadClassValueExpressionFn;
 
     private final List<MethodDefinition<ClassElement, MethodElement>> allMethods = new ArrayList<>();
-    public final List<MethodDefinition<ClassElement, MethodElement>> postConstructMethods = new ArrayList<>();
+    private final List<MethodDefinition<ClassElement, MethodElement>> postConstructMethods = new ArrayList<>();
     private final List<MethodDefinition<ClassElement, MethodElement>> preDestroyMethods = new ArrayList<>();
     private final List<FieldDefinition<ClassElement, FieldElement>> allFields = new ArrayList<>();
 
@@ -1003,7 +1003,6 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
             + "$" + NameUtils.capitalize(methodElement.getName()) + uniqueIdentifier + CLASS_SUFFIX;
     }
 
-
     private static String getBeanDefinitionName(FieldElement fieldElement) {
         return fieldElement.getOwningType().getPackageName()
             + "." + prefixClassName(fieldElement.getOwningType().getSimpleName())
@@ -1028,6 +1027,13 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
             }
         }
         return ClassElement.ZERO_CLASS_ELEMENTS;
+    }
+
+    /**
+     * @return The post construct method definitions scheduled for invocation
+     */
+    public List<MethodDefinition<ClassElement, MethodElement>> getPostConstructMethods() {
+        return postConstructMethods;
     }
 
     /**
@@ -1641,7 +1647,6 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     private boolean needsPreDestroy() {
         return !preDestroyMethods.isEmpty() || isPreDestroyIntercepted();
     }
-
 
     private MethodDef buildDisposeMethod(MethodDef.MethodDefBuilder override) {
         return buildLifeCycleMethod(override, PRE_DESTROY_METHOD, preDestroyMethods);
@@ -3370,7 +3375,6 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
         customInitializerBuilder = builder;
     }
 
-
     private StatementDef invokeCheckIfShouldLoadIfNecessary(VariableDef.This aThis, List<VariableDef.MethodParameter> parameters) {
         AnnotationValue<Requires> requiresAnnotation = annotationMetadata.getAnnotation(Requires.class);
         if (requiresAnnotation != null
@@ -3471,7 +3475,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
                 // interceptor beans cannot have lifecycle methods intercepted
                 return false;
             }
-            final boolean isFactoryMethod = isSuperFactory || elementProducerDefinition instanceof MethodDefinition<?,?>;
+            final boolean isFactoryMethod = isSuperFactory || elementProducerDefinition instanceof MethodDefinition<?, ?>;
             final boolean isProxyTarget = annotationMetadata.booleanValue(AnnotationUtil.ANN_AROUND, "proxyTarget").orElse(false) || isFactoryMethod;
             // for beans that are @Around(proxyTarget = false) only the generated AOP impl should be intercepted
             final boolean isAopType = StringUtils.isNotEmpty(interceptedType);

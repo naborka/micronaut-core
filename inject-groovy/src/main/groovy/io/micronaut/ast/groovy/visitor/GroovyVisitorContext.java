@@ -127,8 +127,6 @@ public class GroovyVisitorContext implements VisitorContext {
         }
         return new GroovyClassWriterOutputVisitor(compilationUnit);
     }
-
-
     @Override
     public Language getLanguage() {
         return Language.GROOVY;

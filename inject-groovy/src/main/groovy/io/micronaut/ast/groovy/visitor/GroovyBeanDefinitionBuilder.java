@@ -104,7 +104,6 @@ class GroovyBeanDefinitionBuilder extends AbstractBeanDefinitionBuilder {
                 );
             }
 
-
         };
     }
 

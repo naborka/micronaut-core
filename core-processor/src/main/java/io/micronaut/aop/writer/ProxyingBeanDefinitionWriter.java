@@ -80,9 +80,10 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
      *
      * <p>Additional {@link Interceptor} types can be added downstream with {@link #visitInterceptorBinding(AnnotationValue[])} .</p>
      *
+     * @param constructor        The constructor used to materialize the proxy
      * @param suffix             The proxy name suffix
      * @param proxyType          The proxyType
-     * @param targetType          The targetType
+     * @param targetType         The targetType
      * @param parent             The parent {@link BeanDefinitionWriter}
      * @param settings           optional setting
      * @param visitorContext     The visitor context
@@ -128,6 +129,7 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
     /**
      * Constructs a new {@link ProxyingBeanDefinitionWriter} for the purposes of writing {@link io.micronaut.aop.Introduction} advise.
      *
+     * @param constructor        The constructor
      * @param suffix             The proxy name suffix
      * @param proxyType          The proxy type
      * @param targetType         The target type
@@ -146,7 +148,7 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
     /**
      * Constructs a new {@link ProxyingBeanDefinitionWriter} for the purposes of writing {@link io.micronaut.aop.Introduction} advise.
      *
-     * @param constructor The constructor
+     * @param constructor        The constructor
      * @param suffix             The proxy name suffix
      * @param proxyType          The proxy type
      * @param targetType         The target type
@@ -187,6 +189,13 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
         executableMethodsDefinitionWriter = null;
     }
 
+    /**
+     * Allows subclasses to provide a custom bean definition name for the proxy.
+     * Implementations must return either {@code null} to use the default naming strategy
+     * or a fully qualified class name unique within the module.
+     *
+     * @return The custom bean definition name or {@code null} to use the default
+     */
     @Nullable
     protected String getCustomBeanDefinitionName() {
         return null;
@@ -227,12 +236,6 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
         if (methodElement.isAbstract()) {
             addIntroductionMethod(methodElement);
         } else if (!ignoreNotAbstract) {
-            boolean isInterface = methodElement.getDeclaringType().isInterface();
-            boolean isDefault = methodElement.isDefault();
-            if (isInterface && isDefault) {
-                // Default methods cannot be "super" accessed on the defined type
-//                declaringType = classElement;
-            }
             // only apply around advise to non-abstract methods of introduction advise
             addAroundMethod(methodElement);
         }
@@ -307,7 +310,7 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
     }
 
     protected final void processAlreadyVisitedMethods(BeanDefinitionWriter parent) {
-        parent.postConstructMethods.forEach(proxyBeanDefinitionWriter::addPostConstruct);
+        parent.getPostConstructMethods().forEach(proxyBeanDefinitionWriter::addPostConstruct);
     }
 
     @Override

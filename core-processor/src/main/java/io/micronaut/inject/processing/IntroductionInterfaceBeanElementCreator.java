@@ -33,6 +33,7 @@ import java.util.List;
 /**
  * Introduction interface proxy builder.
  *
+ * @param <R> The builder result type
  * @author Denis Stepanov
  * @since 4.0.0
  */

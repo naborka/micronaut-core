@@ -31,6 +31,7 @@ import java.util.List;
 /**
  * Abstract shared functionality of the builder.
  *
+ * @param <R> The builder result type
  * @author Denis Stepanov
  * @since 4.0.0
  */

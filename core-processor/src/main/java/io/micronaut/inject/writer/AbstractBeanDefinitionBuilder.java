@@ -330,12 +330,6 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
         if (type != null) {
             final Map<String, ClassElement> typeArguments = type.getTypeArguments();
             Map<String, ClassElement> resolvedTypes = resolveTypeArguments(typeArguments, types);
-            if (resolvedTypes != null) {
-//                if (this.typeArguments == null) {
-//                    this.typeArguments = new LinkedHashMap<>();
-//                }
-//                this.typeArguments.put(type.getName(), resolvedTypes);
-            }
         }
         return this;
     }
@@ -510,6 +504,7 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
     /**
      * Visit the intercepted methods of this type.
      *
+     * @param <R>         The builder result type
      * @param proxyBuilder The proxy builder
      */
     protected <R> void visitInterceptedMethods(ElementProxyBuilder<R> proxyBuilder) {
@@ -555,6 +550,8 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
      * Build the bean definition writer.
      *
      * @param beanDefinitionBuilderFactory The bean definition builder factory
+     * @param <R>                          The builder result type
+     * @return The generated bean definitions
      */
     public <R> List<R> build(ElementBeanDefinitionBuilderFactory<R> beanDefinitionBuilderFactory) {
         ElementBeanDefinitionBuilder<R> beanDefinitionBuilder = buildClass(beanDefinitionBuilderFactory);
@@ -578,8 +575,10 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
     /**
      * Creates the proxy builder.
      *
+     * @param beanDefinitionBuilderFactory The factory used to create element builders
      * @param beanDefinitionBuilder The bean definition builder
      * @param annotationMetadata   The annotation metadata
+     * @param <R>                  The builder result type
      * @return The proxy builder
      */
     protected final <R> ElementProxyBuilder<R> createProxyBuilder(ElementBeanDefinitionBuilderFactory<R> beanDefinitionBuilderFactory,
@@ -668,6 +667,16 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
         }
     }
 
+    /**
+     * Creates the {@link ElementBeanDefinitionBuilder} that will materialize the bean.
+     * Subclasses overriding this method should return a builder created via the supplied factory
+     * and must ensure the associated constructor has been resolved (for example by invoking
+     * {@link #initConstructor(ClassElement)} when customizing the target type).
+     *
+     * @param elementBeanDefinitionBuilderFactory The factory used to create element builders
+     * @param <R>                                 The builder result type
+     * @return The element bean definition builder for the current bean
+     */
     protected <R> ElementBeanDefinitionBuilder<R> createBeanDefinitionBuilder(ElementBeanDefinitionBuilderFactory<R> elementBeanDefinitionBuilderFactory) {
         Element producingElement = getProducingElement();
         if (producingElement instanceof ClassElement) {
