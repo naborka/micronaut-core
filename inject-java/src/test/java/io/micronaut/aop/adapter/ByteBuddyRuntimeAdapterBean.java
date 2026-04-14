@@ -22,20 +22,20 @@ import io.micronaut.aop.runtime.RuntimeProxy;
 import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Singleton;
 
-//@Requires(property = "spec.name", value = "RuntimeProxyAdapterTest")
-//@Singleton
-//@RuntimeProxy(ByteBuddyRuntimeProxy.class)
-//public class ByteBuddyRuntimeAdapterBean {
-//
-//    private String message;
-//
-//    @ByteBuddyStacktraceVerified
-//    @Adapter(MyAdapter.class)
-//    void onMessage(String message) {
-//        this.message = message;
-//    }
-//
-//    public String getMessage() {
-//        return message;
-//    }
-//}
+@Requires(property = "spec.name", value = "RuntimeProxyAdapterTest")
+@Singleton
+@RuntimeProxy(ByteBuddyRuntimeProxy.class)
+public class ByteBuddyRuntimeAdapterBean {
+
+    private String message;
+
+    @ByteBuddyStacktraceVerified
+    @Adapter(MyAdapter.class)
+    void onMessage(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+}
