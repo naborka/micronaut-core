@@ -26,6 +26,9 @@ import java.util.List;
  */
 sealed public interface MemberDefinition<K> extends AnnotationMetadataProviderRecordStyle permits ConstructorDefinition, FieldDefinition, MethodDefinition {
 
+    /**
+     * @return The injection points contributed by this member definition
+     */
     List<BeanDefinitionInjectionPoint<K>> injectionPoints();
 
 }

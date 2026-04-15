@@ -30,27 +30,27 @@ public interface ProxyBuilder<C, M, R> extends Builder<R> {
      *
      * @param interfaceElement          The interface element
      */
-    void implementInterface(C interfaceElement);
+    ProxyBuilder<C, M, R> implementInterface(C interfaceElement);
 
     /**
      * Adds a proxied method that delegates to the target.
      *
      * @param methodElement The method to proxy
      */
-    void addProxyMethod(M methodElement);
+    ProxyBuilder<C, M, R> addProxyMethod(M methodElement);
 
     /**
      * Adds an introduction method implemented directly by the proxy.
      *
      * @param methodElement The method to introduce
      */
-    void addIntroductionMethod(M methodElement);
+    ProxyBuilder<C, M, R> addIntroductionMethod(M methodElement);
 
     /**
      * Adds a method that should participate in around advice.
      *
      * @param methodElement The method element
      */
-    void addAroundMethod(M methodElement);
+    ProxyBuilder<C, M, R> addAroundMethod(M methodElement);
 
 }

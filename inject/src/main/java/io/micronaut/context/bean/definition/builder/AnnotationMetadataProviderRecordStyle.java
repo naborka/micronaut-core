@@ -26,10 +26,16 @@ import io.micronaut.core.annotation.Internal;
  * @since 5.0
  */
 @Internal
-interface AnnotationMetadataProviderRecordStyle extends AnnotationMetadataProvider {
+sealed interface AnnotationMetadataProviderRecordStyle extends AnnotationMetadataProvider permits BeanDefinitionInjectionPoint, MemberDefinition {
 
+    /**
+     * @return The annotation metadata backing this provider
+     */
     AnnotationMetadata annotationMetadata();
 
+    /**
+     * @return The annotation metadata associated with this element
+     */
     @Override
     default AnnotationMetadata getAnnotationMetadata() {
         return annotationMetadata();

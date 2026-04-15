@@ -341,6 +341,7 @@ public class IntrospectedTypeElementVisitor implements TypeElementVisitor<Object
         } catch (ElementPostponedToNextRoundException ignore) {
             // Ignore, next round will redo
         } catch (IOException e) {
+            e.printStackTrace();
             // raise a compile error
             String message = e.getMessage();
             throw new ProcessingException(outputObjectDef.originatingElements().getOriginatingElements()[0], "Unexpected error: " + (message != null ? message : e.getClass().getSimpleName()));

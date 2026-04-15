@@ -81,7 +81,6 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
      * <p>Additional {@link Interceptor} types can be added downstream with {@link #visitInterceptorBinding(AnnotationValue[])} .</p>
      *
      * @param constructor        The constructor used to materialize the proxy
-     * @param suffix             The proxy name suffix
      * @param proxyType          The proxyType
      * @param targetType         The targetType
      * @param parent             The parent {@link BeanDefinitionWriter}
@@ -90,7 +89,6 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
      * @param interceptorBinding The interceptor binding of the {@link Interceptor} instances to be injected
      */
     public ProxyingBeanDefinitionWriter(MethodElement constructor,
-                                        @Nullable String suffix,
                                         ClassElement proxyType,
                                         ClassElement targetType,
                                         BeanDefinitionWriter parent,
@@ -130,26 +128,23 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
      * Constructs a new {@link ProxyingBeanDefinitionWriter} for the purposes of writing {@link io.micronaut.aop.Introduction} advise.
      *
      * @param constructor        The constructor
-     * @param suffix             The proxy name suffix
      * @param proxyType          The proxy type
      * @param targetType         The target type
      * @param visitorContext     The visitor context
      * @param interceptorBinding The interceptor types
      */
     public ProxyingBeanDefinitionWriter(MethodElement constructor,
-                                        @Nullable String suffix,
                                         ClassElement proxyType,
                                         ClassElement targetType,
                                         VisitorContext visitorContext,
                                         AnnotationValue<?>... interceptorBinding) {
-        this(constructor, suffix, proxyType, targetType, true, visitorContext, interceptorBinding);
+        this(constructor, proxyType, targetType, true, visitorContext, interceptorBinding);
     }
 
     /**
      * Constructs a new {@link ProxyingBeanDefinitionWriter} for the purposes of writing {@link io.micronaut.aop.Introduction} advise.
      *
      * @param constructor        The constructor
-     * @param suffix             The proxy name suffix
      * @param proxyType          The proxy type
      * @param targetType         The target type
      * @param implementInterface Whether the interface should be implemented. If false the {@code interfaceTypes} argument should contain at least one entry
@@ -157,7 +152,6 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
      * @param interceptorBinding The interceptor binding
      */
     public ProxyingBeanDefinitionWriter(MethodElement constructor,
-                                        @Nullable String suffix,
                                         ClassElement proxyType,
                                         ClassElement targetType,
                                         boolean implementInterface,
@@ -176,6 +170,8 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
         this.visitorContext = visitorContext;
         this.proxyBeanDefinitionWriter = new BeanDefinitionWriter(
             BeanInjectionUtils.createConstructorDefinition(constructor, visitorContext),
+            getCustomBeanDefinitionName(),
+            targetType.getAnnotationMetadata(),
             implementInterface ? OriginatingElements.of(targetType) : OriginatingElements.of(),
             visitorContext
         );
@@ -202,7 +198,7 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
     }
 
     @Override
-    public void implementInterface(ClassElement interfaceElement) {
+    public ProxyingBeanDefinitionWriter implementInterface(ClassElement interfaceElement) {
         interfaceTypes.add(interfaceElement);
         proxyBeanDefinitionWriter.setExposes(interfaceTypes);
         proxyBeanDefinitionWriter.addOriginatingElement(interfaceElement);
@@ -221,11 +217,13 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
 
                 addProxyMethodInternal(methodElement, true);
             });
+        return this;
     }
 
     @Override
-    public void addProxyMethod(MethodElement methodElement) {
+    public ProxyingBeanDefinitionWriter addProxyMethod(MethodElement methodElement) {
         addProxyMethodInternal(methodElement, false);
+        return this;
     }
 
     private void addProxyMethodInternal(MethodElement methodElement, boolean ignoreNotAbstract) {
@@ -369,9 +367,9 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
     }
 
     @Override
-    public void addAroundMethod(MethodElement methodElement) {
+    public ProxyingBeanDefinitionWriter addAroundMethod(MethodElement methodElement) {
         if (findOverriddenBy(methodElement) != null) {
-            return;
+            return this;
         }
 
         AnnotationMetadata methodAnnotationMetadata = methodElement.getMethodAnnotationMetadata();
@@ -384,11 +382,13 @@ public abstract class ProxyingBeanDefinitionWriter implements ElementProxyBuilde
 
         BeanDefinitionWriter beanDefinitionWriter = parentWriter == null ? proxyBeanDefinitionWriter : parentWriter;
         beanDefinitionWriter.addExecutableMethod(methodElement, false);
+        return this;
     }
 
     @Override
-    public void addIntroductionMethod(MethodElement methodElement) {
+    public ProxyingBeanDefinitionWriter addIntroductionMethod(MethodElement methodElement) {
         addAroundMethod(methodElement);
+        return this;
     }
 
     @Override

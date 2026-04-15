@@ -35,6 +35,7 @@ import io.micronaut.sourcegen.model.TypeDef;
 import org.jspecify.annotations.NullUnmarked;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * The writer for runtime proxy bean definitions.
@@ -69,20 +70,23 @@ public class RuntimeProxyBeanDefinitionWriter extends ProxyingBeanDefinitionWrit
         BeanResolutionContext.class, BeanDefinition.class);
 
     public RuntimeProxyBeanDefinitionWriter(ClassElement targetType, BeanDefinitionWriter parent, OptionalValues<Boolean> settings, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
-        super(getConstructor(targetType), RUNTIME_PROXY_SUFFIX, targetType, targetType, parent, settings, visitorContext, interceptorBinding);
+        super(getConstructor(targetType), targetType, targetType, parent, settings, visitorContext, interceptorBinding);
     }
 
     public RuntimeProxyBeanDefinitionWriter(ClassElement targetType, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
-        super(getConstructor(targetType), RUNTIME_PROXY_SUFFIX, targetType, targetType, visitorContext, interceptorBinding);
+        super(getConstructor(targetType), targetType, targetType, visitorContext, interceptorBinding);
     }
 
     public RuntimeProxyBeanDefinitionWriter(String suffix, ClassElement targetType, boolean implementInterface, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
-        super(getConstructor(targetType), suffix + RUNTIME_PROXY_SUFFIX, targetType, targetType, implementInterface, visitorContext, interceptorBinding);
+        super(getConstructor(targetType),
+            ClassElement.of(targetType.getName() + suffix, true, targetType.getAnnotationMetadata(), Map.of()),
+            targetType,
+            implementInterface, visitorContext, interceptorBinding);
     }
 
     @Override
     public String getCustomBeanDefinitionName() {
-        return proxyType.getPackageName() + prefixClassName(proxyType.getSimpleName()) + RUNTIME_PROXY_SUFFIX;
+        return proxyType.getPackageName() + "." + prefixClassName(proxyType.getSimpleName()) + RUNTIME_PROXY_SUFFIX;
     }
 
     private static String prefixClassName(String className) {

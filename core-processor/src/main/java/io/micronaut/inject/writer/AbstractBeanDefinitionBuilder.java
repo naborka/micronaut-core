@@ -630,7 +630,7 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
             members.sort((o1, o2) -> {
                 if (o1 instanceof FieldElement && o2 instanceof MethodElement) {
                     return 1;
-                } else if (o1 instanceof MethodElement && o1 instanceof FieldElement) {
+                } else if (o1 instanceof MethodElement && o2 instanceof FieldElement) {
                     return -1;
                 }
                 return 0;

@@ -296,7 +296,10 @@ public class BeanInjectionUtils {
         return new BeanDefinitionInjectionPoint.ValueInjectionPoint<>(
             genericType,
             annotationMetadata,
-            annotationMetadata.stringValue(Value.class).orElseThrow(() -> new ProcessingException((Element) annotationMetadata, "Value injection requires a value")),
+            annotationMetadata.stringValue(Value.class)
+                .orElseThrow(() -> new ProcessingException(
+                    annotationMetadata instanceof Element element ? element : null,
+                    "Value injection requires a value")),
             annotationMetadata.getValue(Value.class, EvaluatedExpressionReference.class).isPresent()
         );
     }

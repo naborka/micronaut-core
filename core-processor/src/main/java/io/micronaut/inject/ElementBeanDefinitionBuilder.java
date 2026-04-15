@@ -48,8 +48,9 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param reflectionRequired Whether reflective invocation is required
      * @param visitorContext     The visitor context
      */
-    default void addPostConstruct(MethodElement methodElement, boolean reflectionRequired, VisitorContext visitorContext) {
+    default ElementBeanDefinitionBuilder<R> addPostConstruct(MethodElement methodElement, boolean reflectionRequired, VisitorContext visitorContext) {
         addPostConstruct(createMethodDefinition(methodElement.getOwningType(), methodElement, methodElement, reflectionRequired, visitorContext));
+        return this;
     }
 
     /**
@@ -59,8 +60,9 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param reflectionRequired Whether reflective invocation is required
      * @param visitorContext     The visitor context
      */
-    default void addPreDestroy(MethodElement methodElement, boolean reflectionRequired, VisitorContext visitorContext) {
+    default ElementBeanDefinitionBuilder<R> addPreDestroy(MethodElement methodElement, boolean reflectionRequired, VisitorContext visitorContext) {
         addPreDestroy(createMethodDefinition(methodElement.getOwningType(), methodElement, methodElement, reflectionRequired, visitorContext));
+        return this;
     }
 
     /**
@@ -70,8 +72,9 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param reflectionRequired Whether reflective access is required
      * @param visitorContext     The visitor context
      */
-    default void addFieldInjection(FieldElement fieldElement, boolean reflectionRequired, VisitorContext visitorContext) {
+    default ElementBeanDefinitionBuilder<R> addFieldInjection(FieldElement fieldElement, boolean reflectionRequired, VisitorContext visitorContext) {
         addFieldInjection(createFieldDefinition(fieldElement.getOwningType(), fieldElement, reflectionRequired, visitorContext));
+        return this;
     }
 
     /**
@@ -81,8 +84,9 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param reflectionRequired Whether reflective invocation is required
      * @param visitorContext     The visitor context
      */
-    default void addMethodInjection(MethodElement methodElement, boolean reflectionRequired, VisitorContext visitorContext) {
+    default ElementBeanDefinitionBuilder<R> addMethodInjection(MethodElement methodElement, boolean reflectionRequired, VisitorContext visitorContext) {
         addMethodInjection(createMethodDefinition(methodElement.getOwningType(), methodElement, methodElement, reflectionRequired, visitorContext));
+        return this;
     }
 
     /**
@@ -94,7 +98,7 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param isOptional         Whether the injection is optional
      * @param visitorContext     The visitor context
      */
-    default void addFieldPropertyInjection(FieldElement fieldElement,
+    default ElementBeanDefinitionBuilder<R> addFieldPropertyInjection(FieldElement fieldElement,
                                            AnnotationMetadata annotationMetadata,
                                            boolean reflectionRequired,
                                            boolean isOptional,
@@ -115,6 +119,7 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
                 reflectionRequired,
                 isOptional)
         );
+        return this;
     }
 
     /**
@@ -125,9 +130,9 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param reflectionRequired Whether reflective access is required
      * @param visitorContext     The visitor context
      */
-    default void addFieldPropertyInjection(FieldElement fieldElement,
+    default ElementBeanDefinitionBuilder<R> addFieldPropertyInjection(FieldElement fieldElement,
                                            AnnotationMetadata annotationMetadata,
                                            boolean reflectionRequired, VisitorContext visitorContext) {
-        addFieldPropertyInjection(fieldElement, annotationMetadata, reflectionRequired, !InjectionPoint.isInjectionRequired(fieldElement), visitorContext);
+        return addFieldPropertyInjection(fieldElement, annotationMetadata, reflectionRequired, !InjectionPoint.isInjectionRequired(fieldElement), visitorContext);
     }
 }

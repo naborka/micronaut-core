@@ -859,26 +859,29 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     }
 
     @Override
-    public void addPostConstruct(MethodDefinition<ClassElement, MethodElement> methodDefinition) {
+    public BeanDefinitionWriter addPostConstruct(MethodDefinition<ClassElement, MethodElement> methodDefinition) {
         allMethods.add(methodDefinition);
         postConstructMethods.add(methodDefinition);
         postProcessMethod(methodDefinition);
+        return this;
     }
 
     @Override
-    public void addPreDestroy(MethodDefinition<ClassElement, MethodElement> methodDefinition) {
+    public BeanDefinitionWriter addPreDestroy(MethodDefinition<ClassElement, MethodElement> methodDefinition) {
         allMethods.add(methodDefinition);
         preDestroyMethods.add(methodDefinition);
         postProcessMethod(methodDefinition);
+        return this;
     }
 
     @Override
-    public void addMethodInjection(MethodDefinition<ClassElement, MethodElement> methodDefinition) {
+    public BeanDefinitionWriter addMethodInjection(MethodDefinition<ClassElement, MethodElement> methodDefinition) {
         injectCommands.add(new InjectMethod(methodDefinition));
         if (shouldKeepInjectionPoint(methodDefinition.annotationMetadata())) {
             allMethods.add(methodDefinition);
         }
         postProcessMethod(methodDefinition);
+        return this;
     }
 
     private void postProcessMethod(MethodDefinition<ClassElement, MethodElement> methodDefinition) {
@@ -894,13 +897,15 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     }
 
     @Override
-    public void addFieldConfigurationBuilder(FieldElement fieldElement, AnnotationMetadata annotationMetadata, List<MethodDefinition<ClassElement, MethodElement>> builderMethods) {
+    public BeanDefinitionWriter addFieldConfigurationBuilder(FieldElement fieldElement, AnnotationMetadata annotationMetadata, List<MethodDefinition<ClassElement, MethodElement>> builderMethods) {
         injectCommands.add(new InjectFieldConfigurationBuilder(fieldElement, annotationMetadata, builderMethods));
+        return this;
     }
 
     @Override
-    public void addMethodConfigurationBuilder(MethodElement methodElement, AnnotationMetadata annotationMetadata, List<MethodDefinition<ClassElement, MethodElement>> builderMethods) {
+    public BeanDefinitionWriter addMethodConfigurationBuilder(MethodElement methodElement, AnnotationMetadata annotationMetadata, List<MethodDefinition<ClassElement, MethodElement>> builderMethods) {
         injectCommands.add(new InjectMethodConfigurationBuilder(methodElement, annotationMetadata, builderMethods));
+        return this;
     }
 
     private boolean shouldKeepInjectionPoint(AnnotationMetadata annotationMetadata1) {
@@ -908,7 +913,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     }
 
     @Override
-    public void addFieldInjection(FieldDefinition<ClassElement, FieldElement> fieldDefinition) {
+    public BeanDefinitionWriter addFieldInjection(FieldDefinition<ClassElement, FieldElement> fieldDefinition) {
         injectCommands.add(new InjectField(fieldDefinition));
         if (shouldKeepInjectionPoint(fieldDefinition.annotationMetadata())) {
             allFields.add(fieldDefinition);
@@ -916,6 +921,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
         FieldElement fieldElement = fieldDefinition.fieldElement();
         autoApplyNamedIfPresent(fieldElement, fieldElement.getAnnotationMetadata());
         evaluatedExpressionProcessor.processEvaluatedExpressions(fieldElement.getAnnotationMetadata(), fieldElement.getOwningType());
+        return this;
     }
 
     /**
@@ -2607,8 +2613,9 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     }
 
     @Override
-    public void addExecutableMethod(MethodElement methodElement, boolean requiresReflection) {
+    public BeanDefinitionWriter addExecutableMethod(MethodElement methodElement, boolean requiresReflection) {
         getExecutableMethodsWriter().addExecutableMethod(methodElement.getDeclaringType(), methodElement);
+        return this;
     }
 
     @Override

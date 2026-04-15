@@ -37,35 +37,35 @@ public interface BeanDefinitionBuilder<C, M, F, R> extends Builder<R> {
      * @param methodElement      The method element
      * @param requiresReflection Whether reflective invocation is required
      */
-    void addExecutableMethod(M methodElement, boolean requiresReflection);
+    BeanDefinitionBuilder<C, M, F, R> addExecutableMethod(M methodElement, boolean requiresReflection);
 
     /**
      * Adds a method injection point to the bean definition.
      *
      * @param methodDefinition The method definition
      */
-    void addMethodInjection(MethodDefinition<C, M> methodDefinition);
+    BeanDefinitionBuilder<C, M, F, R> addMethodInjection(MethodDefinition<C, M> methodDefinition);
 
     /**
      * Adds a field injection point to the bean definition.
      *
      * @param fieldDefinition The field definition
      */
-    void addFieldInjection(FieldDefinition<C, F> fieldDefinition);
+    BeanDefinitionBuilder<C, M, F, R> addFieldInjection(FieldDefinition<C, F> fieldDefinition);
 
     /**
      * Registers a {@code @PostConstruct} method.
      *
      * @param methodDefinition The lifecycle method definition
      */
-    void addPostConstruct(MethodDefinition<C, M> methodDefinition);
+    BeanDefinitionBuilder<C, M, F, R> addPostConstruct(MethodDefinition<C, M> methodDefinition);
 
     /**
      * Registers a {@code @PreDestroy} method.
      *
      * @param methodDefinition The lifecycle method definition
      */
-    void addPreDestroy(MethodDefinition<C, M> methodDefinition);
+    BeanDefinitionBuilder<C, M, F, R> addPreDestroy(MethodDefinition<C, M> methodDefinition);
 
     /**
      * Adds a field-based configuration builder.
@@ -74,7 +74,7 @@ public interface BeanDefinitionBuilder<C, M, F, R> extends Builder<R> {
      * @param annotationMetadata  Associated annotation metadata
      * @param builderMethods      The builder methods
      */
-    void addFieldConfigurationBuilder(F fieldElement, AnnotationMetadata annotationMetadata, List<MethodDefinition<C, M>> builderMethods);
+    BeanDefinitionBuilder<C, M, F, R> addFieldConfigurationBuilder(F fieldElement, AnnotationMetadata annotationMetadata, List<MethodDefinition<C, M>> builderMethods);
 
     /**
      * Adds a method-based configuration builder.
@@ -83,6 +83,6 @@ public interface BeanDefinitionBuilder<C, M, F, R> extends Builder<R> {
      * @param annotationMetadata  Associated annotation metadata
      * @param builderMethods      The builder methods
      */
-    void addMethodConfigurationBuilder(M methodElement, AnnotationMetadata annotationMetadata, List<MethodDefinition<C, M>> builderMethods);
+    BeanDefinitionBuilder<C, M, F, R> addMethodConfigurationBuilder(M methodElement, AnnotationMetadata annotationMetadata, List<MethodDefinition<C, M>> builderMethods);
 
 }

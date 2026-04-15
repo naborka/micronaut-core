@@ -53,7 +53,6 @@ import io.micronaut.inject.writer.ArgumentExpUtils;
 import io.micronaut.inject.writer.BeanDefinitionWriter;
 import io.micronaut.inject.writer.ExecutableMethodsDefinitionWriter;
 import io.micronaut.inject.writer.MethodGenUtils;
-import io.micronaut.sourcegen.model.AnnotationDef;
 import io.micronaut.sourcegen.model.ClassDef;
 import io.micronaut.sourcegen.model.ClassTypeDef;
 import io.micronaut.sourcegen.model.ExpressionDef;
@@ -67,11 +66,6 @@ import org.jspecify.annotations.NullUnmarked;
 import org.jspecify.annotations.Nullable;
 
 import javax.lang.model.element.Modifier;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -228,7 +222,7 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
                           AnnotationValue<?>... interceptorBinding) {
         super(
             createProxyConstructor(targetType, createProxyType(parent), visitorContext),
-            null,
+//            null,
             createProxyType(parent),
             targetType,
             parent,
@@ -255,7 +249,7 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
                           AnnotationValue<?>... interceptorBinding) {
         super(
             createProxyConstructor(targetType, createProxyType(targetType), visitorContext),
-            null,
+//            null,
             createProxyType(targetType),
             targetType,
             implementInterface,
@@ -324,7 +318,7 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
      * @param methodElement The method element
      **/
     @Override
-    public void addAroundMethod(MethodElement methodElement) {
+    public AopProxyWriter addAroundMethod(MethodElement methodElement) {
         AnnotationMetadata methodAnnotationMetadata = methodElement.getMethodAnnotationMetadata();
 
         if (InterceptedMethodUtil.hasAroundStereotype(methodAnnotationMetadata)) {
@@ -338,12 +332,13 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
 
         MethodElement overriddenBy = findOverriddenBy(methodElement);
         if (overriddenBy != null) {
-            proxyBuilder.addMethod(copyRuntimeMethodAnnotations(MethodDef.override(methodElement), methodElement)
-                .build((aThis, methodParameters) -> aThis.invoke(overriddenBy, methodParameters).returning())
-            );
-            return;
+            overriddenMethods.put(methodElement, overriddenBy);
+        } else {
+            methodsWriter.addExecutableMethod(methodElement.getDeclaringType(), methodElement);
         }
         aroundMethods.add(methodElement);
+
+        return this;
     }
 
     private void addInterceptedIfNeeded(ClassDef.ClassDefBuilder proxyBuilder,
@@ -402,7 +397,7 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
                                            @Nullable FieldDef targetField,
                                            FieldDef interceptorsField,
                                            FieldDef proxyMethodsField) {
-        return copyRuntimeMethodAnnotations(MethodDef.override(methodElement), methodElement)
+        return MethodDef.override(methodElement)
             .build((aThis, methodParameters) -> {
 
                 ExpressionDef targetArgument;
@@ -452,19 +447,6 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
             });
     }
 
-    private MethodDef.MethodDefBuilder copyRuntimeMethodAnnotations(MethodDef.MethodDefBuilder methodBuilder,
-                                                                    MethodElement methodElement) {
-        for (AnnotationValue<Annotation> annotationValue : methodElement.getMethodAnnotationMetadata().getDeclaredAnnotationValuesByType(Annotation.class)) {
-            if (annotationValue.getRetentionPolicy() == RetentionPolicy.RUNTIME) {
-                methodBuilder.addAnnotation(AnnotationDef.of(annotationValue, visitorContext));
-            }
-        }
-        return methodBuilder;
-    }
-
-    /**
-     * Finalizes the proxy. This method should be called before writing the proxy to disk with {@link #writeTo(File)}
-     */
     @Override
     public List<OutputObjectDef> build() {
 
@@ -517,7 +499,7 @@ public class AopProxyWriter extends ProxyingBeanDefinitionWriter {
         for (MethodElement aroundMethod : aroundMethods) {
             MethodElement overriddenByMethod = overriddenMethods.get(aroundMethod);
             if (overriddenByMethod != null) {
-                proxyBuilder.addMethod(copyRuntimeMethodAnnotations(MethodDef.override(aroundMethod), aroundMethod)
+                proxyBuilder.addMethod(MethodDef.override(aroundMethod)
                     .build((aThis, methodParameters) -> aThis.invoke(overriddenByMethod, methodParameters).returning())
                 );
             } else {
