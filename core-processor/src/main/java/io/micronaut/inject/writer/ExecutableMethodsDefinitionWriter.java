@@ -180,6 +180,11 @@ public class ExecutableMethodsDefinitionWriter implements Builder<OutputObjectDe
         evaluatedExpressionProcessor.processEvaluatedExpressions(methodElement);
 
         methodDispatchWriter.addOrGetMethod(declaringType, methodElement);
+
+        MutableAnnotationMetadata.contributeDefaults(
+            annotationMetadataWithDefaults,
+            methodElement
+        );
     }
 
     public final void addBridgeMethod(MethodElement methodElement, MethodElement proxyMethod) {
@@ -368,7 +373,7 @@ public class ExecutableMethodsDefinitionWriter implements Builder<OutputObjectDe
             // 1: declaringType
             ExpressionDef.constant(ClassTypeDef.of(declaringType)),
             // 2: annotationMetadata
-            annotationMetadata(annotationMetadataWithDefaults, annotationMetadata, loadClassValueExpressionFn),
+            annotationMetadata(annotationMetadata, loadClassValueExpressionFn),
             // 3: methodName
             ExpressionDef.constant(methodElement.getName()),
             // 4: return argument
@@ -388,37 +393,23 @@ public class ExecutableMethodsDefinitionWriter implements Builder<OutputObjectDe
         );
     }
 
-    private ExpressionDef annotationMetadata(AnnotationMetadata annotationMetadataWithDefaults,
-                                             AnnotationMetadata annotationMetadata,
+    private ExpressionDef annotationMetadata(AnnotationMetadata annotationMetadata,
                                              Function<String, ExpressionDef> loadClassValueExpressionFn) {
 
         if (annotationMetadata == AnnotationMetadata.EMPTY_METADATA || annotationMetadata.isEmpty()) {
             return ExpressionDef.nullValue();
         }
-        if (annotationMetadata instanceof AnnotationMetadataReference annotationMetadataReference) {
-            return AnnotationMetadataGenUtils.annotationMetadataReference(annotationMetadataReference);
-        }
-        if (annotationMetadata instanceof AnnotationMetadataHierarchy annotationMetadataHierarchy) {
-            MutableAnnotationMetadata.contributeDefaults(
-                annotationMetadataWithDefaults,
-                annotationMetadataHierarchy
-            );
-            return AnnotationMetadataGenUtils.instantiateNewMetadataHierarchy(annotationMetadataHierarchy, loadClassValueExpressionFn);
-        }
-        if (annotationMetadata instanceof MutableAnnotationMetadata mutableAnnotationMetadata) {
-            MutableAnnotationMetadata.contributeDefaults(
-                annotationMetadataWithDefaults,
-                annotationMetadata
-            );
-            return AnnotationMetadataGenUtils.instantiateNewMetadata(mutableAnnotationMetadata, loadClassValueExpressionFn);
-        }
-        throw new IllegalStateException("Unknown metadata: " + annotationMetadata);
+        return switch (annotationMetadata) {
+            case AnnotationMetadataReference annotationMetadataReference ->
+                AnnotationMetadataGenUtils.annotationMetadataReference(annotationMetadataReference);
+            case AnnotationMetadataHierarchy annotationMetadataHierarchy ->
+                AnnotationMetadataGenUtils.instantiateNewMetadataHierarchy(annotationMetadataHierarchy, loadClassValueExpressionFn);
+            case MutableAnnotationMetadata mutableAnnotationMetadata ->
+                AnnotationMetadataGenUtils.instantiateNewMetadata(mutableAnnotationMetadata, loadClassValueExpressionFn);
+            default -> throw new IllegalStateException("Unknown metadata: " + annotationMetadata);
+        };
     }
 
-    /**
-     * @param p The class element
-     * @return The string representation
-     */
     /**
      * Retrieves the total count of methods.
      *

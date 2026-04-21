@@ -903,18 +903,23 @@ public class MutableAnnotationMetadata extends DefaultAnnotationMetadata {
      */
     @Internal
     public static void contributeRepeatable(AnnotationMetadata target, AnnotationMetadata source) {
-        source = source.getTargetAnnotationMetadata();
+        source = source.getDeclaredMetadata();
         if (source instanceof AnnotationMetadataHierarchy hierarchy) {
             source = hierarchy.merge();
         }
-        if (target instanceof MutableAnnotationMetadata damTarget && source instanceof MutableAnnotationMetadata damSource) {
-            if (damSource.annotationRepeatableContainer != null && !damSource.annotationRepeatableContainer.isEmpty()) {
-                if (damTarget.annotationRepeatableContainer == null) {
-                    damTarget.annotationRepeatableContainer = new HashMap<>(damSource.annotationRepeatableContainer);
-                } else {
-                    damTarget.annotationRepeatableContainer.putAll(damSource.annotationRepeatableContainer);
+        if (target instanceof MutableAnnotationMetadata damTarget) {
+            if (source instanceof MutableAnnotationMetadata damSource) {
+                if (damSource.annotationRepeatableContainer != null && !damSource.annotationRepeatableContainer.isEmpty()) {
+                    if (damTarget.annotationRepeatableContainer == null) {
+                        damTarget.annotationRepeatableContainer = new HashMap<>(damSource.annotationRepeatableContainer);
+                    } else {
+                        damTarget.annotationRepeatableContainer.putAll(damSource.annotationRepeatableContainer);
+                    }
                 }
             }
+        } else {
+            new RuntimeException().printStackTrace();
+            throw new IllegalStateException("Cannot contribute repeatable annotation to target: " + target.getClass());
         }
     }
 

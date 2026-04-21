@@ -651,6 +651,8 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     private boolean superBeanDefinition = false;
     private boolean isSuperFactory = false;
     private final AnnotationMetadata annotationMetadata;
+    // Sometimes the original annotations are hierarchy etc and there we cannot contribute defaults easily
+    private final AnnotationMetadata annotationMetadataDefaults = new MutableAnnotationMetadata();
     private Map<String, Map<String, ClassElement>> typeArguments;
     @Nullable
     private String interceptedType;
@@ -1325,7 +1327,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     private ExecutableMethodsDefinitionWriter createExecutableMethodsDefinitionWriter() {
         return new ExecutableMethodsDefinitionWriter(
             evaluatedExpressionProcessor,
-            annotationMetadata,
+            annotationMetadataDefaults,
             beanDefinitionName,
             getBeanDefinitionName(),
             originatingElements
@@ -2124,7 +2126,8 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
         }
 
         // Defaults can be contributed by other static initializers, it should be at the end
-        AnnotationMetadataGenUtils.addAnnotationDefaults(statements, annotationMetadata, loadClassValueExpressionFn);
+        MutableAnnotationMetadata.contributeDefaults(annotationMetadataDefaults, annotationMetadata);
+        AnnotationMetadataGenUtils.addAnnotationDefaults(statements, annotationMetadataDefaults, loadClassValueExpressionFn);
 
         return new StaticBlock(
             StatementDef.multi(statements),
@@ -4163,11 +4166,6 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
 
     private ExpressionDef getAnnotationMetadataExpression(AnnotationMetadata annotationMetadata) {
         annotationMetadata = annotationMetadata.getTargetAnnotationMetadata();
-//
-//        MutableAnnotationMetadata.contributeDefaults(
-//            this.annotationMetadata,
-//            annotationMetadata
-//        );
 
         if (annotationMetadata == AnnotationMetadata.EMPTY_METADATA || annotationMetadata.isEmpty()) {
             return ExpressionDef.nullValue();
