@@ -237,6 +237,9 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
 
     public static final String CLASS_SUFFIX = "$Definition";
 
+    private static final String BUILDER_VARIABLE_PREFIX = "builder";
+    private static final String ARGUMENT_MEMBER = "argument";
+
     private static final Method POST_CONSTRUCT_METHOD = ReflectionUtils.getRequiredInternalMethod(AbstractInitializableBeanDefinition.class, "postConstruct", BeanResolutionContext.class, BeanContext.class, Object.class);
 
     private static final Method INJECT_BEAN_METHOD =
@@ -1501,7 +1504,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
 
         ClassTypeDef builderType = ClassTypeDef.of(fieldElement.getGenericType());
         if (StringUtils.isNotEmpty(factoryMethod)) {
-            return builderType.invokeStatic(factoryMethod, builderType).newLocal("builder" + NameUtils.capitalize(fieldElement.getName()), builderVar -> {
+            return builderType.invokeStatic(factoryMethod, builderType).newLocal(BUILDER_VARIABLE_PREFIX + NameUtils.capitalize(fieldElement.getName()), builderVar -> {
                 List<StatementDef> statements = getBuilderMethodStatements(injectMethodSignature, builderMethods, (VariableDef.Local) builderVar);
 
                 statements.add(injectMethodSignature.instanceVar
@@ -1513,7 +1516,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
         } else {
             return injectMethodSignature.instanceVar
                 .field(fieldElement)
-                .newLocal("builder" + NameUtils.capitalize(fieldElement.getName()), builderVar -> StatementDef.multi(
+                .newLocal(BUILDER_VARIABLE_PREFIX + NameUtils.capitalize(fieldElement.getName()), builderVar -> StatementDef.multi(
                     getBuilderMethodStatements(injectMethodSignature, builderMethods, (VariableDef.Local) builderVar)
                 ));
         }
@@ -1529,7 +1532,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
         ClassTypeDef builderType = ClassTypeDef.of(builderMethod.getGenericReturnType());
         String methodName = builderMethod.getName();
         if (StringUtils.isNotEmpty(factoryMethod)) {
-            return builderType.invokeStatic(factoryMethod, builderType).newLocal("builder" + NameUtils.capitalize(methodName), builderVar -> {
+            return builderType.invokeStatic(factoryMethod, builderType).newLocal(BUILDER_VARIABLE_PREFIX + NameUtils.capitalize(methodName), builderVar -> {
                 List<StatementDef> statements =
                     getBuilderMethodStatements(injectMethodSignature, builderMethods, (VariableDef.Local) builderVar);
 
@@ -1544,7 +1547,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
         } else {
             return injectMethodSignature.instanceVar
                 .invoke(methodName, builderType)
-                .newLocal("builder" + NameUtils.capitalize(methodName), builderVar -> StatementDef.multi(
+                .newLocal(BUILDER_VARIABLE_PREFIX + NameUtils.capitalize(methodName), builderVar -> StatementDef.multi(
                     getBuilderMethodStatements(injectMethodSignature, builderMethods, (VariableDef.Local) builderVar)
                 ));
         }
@@ -3307,7 +3310,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
 
         // 4th argument the argument
         ClassElement genericType = entry.getGenericType();
-        StatementDef.DefineAndAssign defineAndAssign = getMethodArgument(entry, annotationMetadata, methodIndex).newLocal("argument");
+        StatementDef.DefineAndAssign defineAndAssign = getMethodArgument(entry, annotationMetadata, methodIndex).newLocal(ARGUMENT_MEMBER);
         additionalStatements.add(defineAndAssign);
         VariableDef.Local argumentVar = defineAndAssign.variable();
         return aThis.invoke(
@@ -3882,13 +3885,13 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     private ExpressionDef resolveAnnotationArgument(int index) {
         return beanDefinitionTypeDef.getStaticField(FIELD_ANNOTATION_INJECTIONS, TypeDef.of(AbstractInitializableBeanDefinition.AnnotationReference[].class))
             .arrayElement(index)
-            .field("argument", TypeDef.of(Argument.class));
+            .field(ARGUMENT_MEMBER, TypeDef.of(Argument.class));
     }
 
     private ExpressionDef resolveFieldArgument(int fieldIndex) {
         return beanDefinitionTypeDef.getStaticField(FIELD_INJECTION_FIELDS, TypeDef.of(AbstractInitializableBeanDefinition.FieldReference[].class))
             .arrayElement(fieldIndex)
-            .field("argument", TypeDef.of(Argument.class));
+            .field(ARGUMENT_MEMBER, TypeDef.of(Argument.class));
     }
 
     @Nullable

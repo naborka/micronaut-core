@@ -77,7 +77,6 @@ sealed class DeclaredBeanElementCreator<R> extends AbstractBeanElementCreator<R>
     private static final String MSG_TARGET_METHOD_PREFIX = "] to target method [";
 
     protected final boolean isAopProxy;
-    protected final ElementBeanDefinitionBuilderFactory<R> beanDefinitionBuilderFactory;
     protected final List<Builder<List<R>>> additionalBuilders = new ArrayList<>();
     private final AtomicInteger adaptedMethodIndex = new AtomicInteger(0);
     private ElementProxyBuilder<R> aopProxyBuilder;
@@ -85,7 +84,6 @@ sealed class DeclaredBeanElementCreator<R> extends AbstractBeanElementCreator<R>
     protected DeclaredBeanElementCreator(ClassElement classElement, VisitorContext visitorContext, boolean isAopProxy, ElementBeanDefinitionBuilderFactory<R> beanDefinitionBuilderFactory) {
         super(classElement, visitorContext, beanDefinitionBuilderFactory);
         this.isAopProxy = isAopProxy;
-        this.beanDefinitionBuilderFactory = beanDefinitionBuilderFactory;
 
         wantOfIncorrectUseOfExecutableMethodProcessor(classElement, visitorContext);
     }

@@ -24,6 +24,7 @@ import io.micronaut.inject.ast.ClassElement;
 import io.micronaut.inject.ast.MethodElement;
 import io.micronaut.inject.ast.PropertyElement;
 import io.micronaut.inject.visitor.VisitorContext;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +69,7 @@ final class AopIntroductionProxySupportedBeanElementCreator<R> extends DeclaredB
     }
 
     @Override
-    protected ElementProxyBuilder<R> getAopProxyBuilder(ElementBeanDefinitionBuilder<R> beanDefinitionBuilder, MethodElement methodElement) {
+    protected ElementProxyBuilder<R> getAopProxyBuilder(ElementBeanDefinitionBuilder<R> beanDefinitionBuilder, @Nullable MethodElement methodElement) {
         return introductionProxyBuilder;
     }
 

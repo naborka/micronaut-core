@@ -111,7 +111,7 @@ public interface ParametrizedInstantiatableBeanDefinition<T> extends Instantiata
      *
      * @param resolutionContext                        The resolution context
      * @param parametrizedInstantiatableBeanDefinition The parameterized bean definition
-     * @param requiredArgumentValues                   he required arguments
+     * @param requiredArgumentValues                   The required arguments
      * @return the required arguments
      * @since 5.0
      */

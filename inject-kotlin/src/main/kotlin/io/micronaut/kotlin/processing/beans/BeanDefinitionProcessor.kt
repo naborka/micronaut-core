@@ -130,7 +130,7 @@ internal class BeanDefinitionProcessor(private val environment: SymbolProcessorE
                 val nativeElement: KotlinNativeElement = astElement.nativeType as KotlinNativeElement
                 kotlinElement = nativeElement.element
             }
-            environment.logger.error("Unexpected error" +  (message ?: e.javaClass.getSimpleName()), kotlinElement)
+            environment.logger.error("Unexpected error: " + (message ?: e.javaClass.getSimpleName()), kotlinElement)
         }
     }
 

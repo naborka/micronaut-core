@@ -21,6 +21,7 @@ package io.micronaut.inject.writer;
  * @author Graeme Rocher
  * @since 1.0
  */
+@SuppressWarnings("java:S1214")
 public interface BeanDefinitionVisitor {
 
     /**

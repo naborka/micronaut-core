@@ -136,7 +136,7 @@ public interface MethodElement extends MemberElement {
     ParameterElement[] getParameters();
 
     /**
-     * Return the parameter with the name of fails.
+     * Return the parameter with the given name or throw if not found.
      *
      * @param name The name of the parameter
      * @return The method parameter with the name supplied

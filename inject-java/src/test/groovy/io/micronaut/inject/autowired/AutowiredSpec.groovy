@@ -4,7 +4,7 @@ import io.micronaut.annotation.processing.test.AbstractTypeElementSpec
 import io.micronaut.context.exceptions.DependencyInjectionException
 import spock.lang.PendingFeature
 
-class   AutowiredSpec extends AbstractTypeElementSpec {
+class AutowiredSpec extends AbstractTypeElementSpec {
 
     void "test autowired required=true (the default)"() {
         given:
