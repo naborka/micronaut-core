@@ -92,14 +92,21 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
         final String o1Type = d1.getName();
         final String o2Type = d2.getName();
         if (o1Type.equals(o2Type)) {
-            return 0;
-        } else {
-            if (d1.isAssignable(d2)) {
-                return 1;
-            } else {
+            if (o1 instanceof FieldElement && o2 instanceof MethodElement) {
                 return -1;
             }
+            if (o1 instanceof MethodElement && o2 instanceof FieldElement) {
+                return 1;
+            }
+            return 0;
         }
+        if (d1.isAssignable(d2)) {
+            return 1;
+        }
+        if (d2.isAssignable(d1)) {
+            return -1;
+        }
+        return 0;
     };
     protected final VisitorContext visitorContext;
     protected final ElementAnnotationMetadataFactory elementAnnotationMetadataFactory;
@@ -193,8 +200,8 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
 
     @Override
     public BeanElementBuilder inject() {
-        processInjectedMethods();
         processInjectedFields();
+        processInjectedMethods();
         return this;
     }
 
@@ -626,17 +633,6 @@ public abstract class AbstractBeanDefinitionBuilder implements BeanElementBuilde
                 );
             list.add(memberElement);
         }
-        for (List<MemberElement> members : sortedInjections.values()) {
-            members.sort((o1, o2) -> {
-                if (o1 instanceof FieldElement && o2 instanceof MethodElement) {
-                    return 1;
-                } else if (o1 instanceof MethodElement && o2 instanceof FieldElement) {
-                    return -1;
-                }
-                return 0;
-            });
-        }
-
         for (List<MemberElement> list : sortedInjections.values()) {
             for (MemberElement memberElement : list) {
                 if (memberElement instanceof FieldElement) {
