@@ -47,6 +47,7 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param methodElement      The source method
      * @param reflectionRequired Whether reflective invocation is required
      * @param visitorContext     The visitor context
+     * @return This builder
      */
     default ElementBeanDefinitionBuilder<R> addPostConstruct(MethodElement methodElement, boolean reflectionRequired, VisitorContext visitorContext) {
         addPostConstruct(createMethodDefinition(methodElement.getOwningType(), methodElement, methodElement, reflectionRequired, visitorContext));
@@ -59,6 +60,7 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param methodElement      The source method
      * @param reflectionRequired Whether reflective invocation is required
      * @param visitorContext     The visitor context
+     * @return This builder
      */
     default ElementBeanDefinitionBuilder<R> addPreDestroy(MethodElement methodElement, boolean reflectionRequired, VisitorContext visitorContext) {
         addPreDestroy(createMethodDefinition(methodElement.getOwningType(), methodElement, methodElement, reflectionRequired, visitorContext));
@@ -71,6 +73,7 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param fieldElement       The field element
      * @param reflectionRequired Whether reflective access is required
      * @param visitorContext     The visitor context
+     * @return This builder
      */
     default ElementBeanDefinitionBuilder<R> addFieldInjection(FieldElement fieldElement, boolean reflectionRequired, VisitorContext visitorContext) {
         addFieldInjection(createFieldDefinition(fieldElement.getOwningType(), fieldElement, reflectionRequired, visitorContext));
@@ -83,6 +86,7 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param methodElement      The method element
      * @param reflectionRequired Whether reflective invocation is required
      * @param visitorContext     The visitor context
+     * @return This builder
      */
     default ElementBeanDefinitionBuilder<R> addMethodInjection(MethodElement methodElement, boolean reflectionRequired, VisitorContext visitorContext) {
         addMethodInjection(createMethodDefinition(methodElement.getOwningType(), methodElement, methodElement, reflectionRequired, visitorContext));
@@ -97,6 +101,7 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param reflectionRequired Whether reflective access is required
      * @param isOptional         Whether the injection is optional
      * @param visitorContext     The visitor context
+     * @return This builder
      */
     default ElementBeanDefinitionBuilder<R> addFieldPropertyInjection(FieldElement fieldElement,
                                            AnnotationMetadata annotationMetadata,
@@ -129,6 +134,7 @@ public interface ElementBeanDefinitionBuilder<R> extends BeanDefinitionBuilder<C
      * @param annotationMetadata The annotation metadata associated with the injection
      * @param reflectionRequired Whether reflective access is required
      * @param visitorContext     The visitor context
+     * @return This builder
      */
     default ElementBeanDefinitionBuilder<R> addFieldPropertyInjection(FieldElement fieldElement,
                                            AnnotationMetadata annotationMetadata,
