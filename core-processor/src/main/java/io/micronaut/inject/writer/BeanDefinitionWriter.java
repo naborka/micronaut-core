@@ -1994,7 +1994,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
             initStatements.add(beanDefinitionTypeDef.getStaticField(typeArgumentsField)
                 .put(GenUtils.stringMapOf(
                     typeArguments, true, null, el -> ArgumentExpUtils.pushTypeArgumentElements(
-                        annotationMetadata,
+                        annotationMetadataDefaults,
                         beanDefinitionTypeDef,
                         ClassElement.of(beanDefinitionName),
                         el,
@@ -3240,7 +3240,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     private ExpressionDef getMethodArgument(ParameterElement entry, AnnotationMetadata annotationMetadata, int methodIndex) {
         if (methodIndex == -1) {
             return ArgumentExpUtils.pushCreateArgument(
-                this.annotationMetadata,
+                this.annotationMetadataDefaults,
                 ClassElement.of(beanFullClassName),
                 beanDefinitionTypeDef,
                 entry.getName(),
@@ -3256,7 +3256,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
     private ExpressionDef getFieldArgument(FieldElement fieldElement, AnnotationMetadata annotationMetadata, int fieldIndex) {
         if (fieldIndex == -1) {
             return ArgumentExpUtils.pushCreateArgument(
-                this.annotationMetadata,
+                this.annotationMetadataDefaults,
                 ClassElement.of(beanFullClassName),
                 beanDefinitionTypeDef,
                 fieldElement.getName(),
@@ -4095,7 +4095,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
                 ExpressionDef.constant(methodElement.getName()),
                 // 3: arguments
                 !methodElement.hasParameters() ? ExpressionDef.nullValue() : ArgumentExpUtils.pushBuildArgumentsForMethod(
-                    this.annotationMetadata,
+                    this.annotationMetadataDefaults,
                     ClassElement.of(beanFullClassName),
                     beanDefinitionTypeDef,
                     Arrays.asList(methodElement.getParameters()),
@@ -4138,7 +4138,7 @@ public final class BeanDefinitionWriter implements BeanElement, Toggleable, Elem
                 ExpressionDef.constant(TypeDef.erasure(declaringType)),
                 // 2: argument
                 ArgumentExpUtils.pushCreateArgument(
-                    this.annotationMetadata,
+                    this.annotationMetadataDefaults,
                     ClassElement.of(beanFullClassName),
                     beanDefinitionTypeDef,
                     fieldElement.getName(),
