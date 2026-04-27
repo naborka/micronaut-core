@@ -211,7 +211,12 @@ public class DefaultElementBeanDefinitionBuilderFactory implements ElementBeanDe
 
     @Override
     public ElementProxyBuilder<OutputObjectDef> introductionProxy(String proxyName, AnnotationMetadata proxyAnnotationMetadata) {
-        return introductionProxy(ClassElement.of(proxyName, true, proxyAnnotationMetadata, Map.of()), false);
+        return introductionProxy(ClassElement.of(proxyName, true, proxyAnnotationMetadata, Map.of()), null, false);
+    }
+
+    @Override
+    public ElementProxyBuilder<OutputObjectDef> introductionProxy(String proxyName, AnnotationMetadata proxyAnnotationMetadata, ClassElement beanType) {
+        return introductionProxy(ClassElement.of(proxyName, true, proxyAnnotationMetadata, Map.of()), beanType, false);
     }
 
     /**
@@ -222,6 +227,12 @@ public class DefaultElementBeanDefinitionBuilderFactory implements ElementBeanDe
      * @return The configured proxy writer
      */
     private ProxyingBeanDefinitionWriter introductionProxy(ClassElement target,
+                                                           boolean implementsInterface) {
+        return introductionProxy(target, null, implementsInterface);
+    }
+
+    private ProxyingBeanDefinitionWriter introductionProxy(ClassElement target,
+                                                           @Nullable ClassElement beanType,
                                                            boolean implementsInterface) {
         AnnotationMetadata annotationMetadata = target.getAnnotationMetadata();
 
@@ -234,10 +245,20 @@ public class DefaultElementBeanDefinitionBuilderFactory implements ElementBeanDe
         ProxyingBeanDefinitionWriter aopProxyWriter;
 
         if (target.hasStereotype(RuntimeProxy.class)) {
-            aopProxyWriter = new RuntimeProxyBeanDefinitionWriter(
-                target,
-                visitorContext,
-                interceptorTypes);
+            if (beanType == null) {
+                aopProxyWriter = new RuntimeProxyBeanDefinitionWriter(
+                    target,
+                    implementsInterface,
+                    visitorContext,
+                    interceptorTypes);
+            } else {
+                aopProxyWriter = new RuntimeProxyBeanDefinitionWriter(
+                    target,
+                    beanType,
+                    implementsInterface,
+                    visitorContext,
+                    interceptorTypes);
+            }
 
         } else {
             aopProxyWriter = new AopProxyWriter(

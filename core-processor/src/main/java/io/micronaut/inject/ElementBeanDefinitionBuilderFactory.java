@@ -90,6 +90,20 @@ public interface ElementBeanDefinitionBuilderFactory<R> extends BeanDefinitionBu
     ElementProxyBuilder<R> introductionProxy(String proxyName,
                                              AnnotationMetadata proxyAnnotationMetadata);
 
+    /**
+     * Creates an introduction proxy builder using the provided metadata and bean type.
+     *
+     * @param proxyName               The proxy class name
+     * @param proxyAnnotationMetadata The proxy annotation metadata
+     * @param beanType                The bean type exposed by the proxy
+     * @return The proxy builder
+     */
+    default ElementProxyBuilder<R> introductionProxy(String proxyName,
+                                                     AnnotationMetadata proxyAnnotationMetadata,
+                                                     ClassElement beanType) {
+        return introductionProxy(proxyName, proxyAnnotationMetadata);
+    }
+
     @Override
     ElementBeanDefinitionBuilder<R> constructor(ConstructorDefinition<ClassElement, MethodElement> constructorDefinition);
 

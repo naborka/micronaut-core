@@ -77,6 +77,14 @@ public class RuntimeProxyBeanDefinitionWriter extends ProxyingBeanDefinitionWrit
         super(getConstructor(targetType), targetType, targetType, visitorContext, interceptorBinding);
     }
 
+    public RuntimeProxyBeanDefinitionWriter(ClassElement targetType, boolean implementInterface, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
+        super(getConstructor(targetType), targetType, targetType, implementInterface, visitorContext, interceptorBinding);
+    }
+
+    public RuntimeProxyBeanDefinitionWriter(ClassElement proxyType, ClassElement beanType, boolean implementInterface, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
+        super(getConstructor(beanType), proxyType, proxyType, implementInterface, visitorContext, interceptorBinding);
+    }
+
     public RuntimeProxyBeanDefinitionWriter(String suffix, ClassElement targetType, boolean implementInterface, VisitorContext visitorContext, AnnotationValue<?>... interceptorBinding) {
         super(getConstructor(targetType),
             ClassElement.of(targetType.getName() + suffix, true, targetType.getAnnotationMetadata(), Map.of()),

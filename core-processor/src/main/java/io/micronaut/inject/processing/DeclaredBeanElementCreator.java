@@ -623,10 +623,11 @@ sealed class DeclaredBeanElementCreator<R> extends AbstractBeanElementCreator<R>
             new AnnotationMetadataHierarchy(classElement, interfaceToAdapt)
         );
 
+        // TODO: The best would be to add a requires for the adapted bean instead of copying all the annotations
         ElementProxyBuilder<R> aopProxyWriter = beanDefinitionBuilderFactory.introductionProxy(
             adapterProxyClassName,
-            proxyAnnotationMetadata
-             // TODO: The best would be to add a requires for the adapted bean instead of coping all the annotations
+            proxyAnnotationMetadata,
+            interfaceToAdapt
         );
         additionalBuilders.add(aopProxyWriter);
 
